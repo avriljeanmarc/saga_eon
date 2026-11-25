@@ -9,6 +9,30 @@ void main() {
 }
 
 // ============================================================================
+// LOCALIZATION (ENGLISH & FRENCH)
+// ============================================================================
+
+enum AppLang { en, fr }
+
+class S {
+  static String tr(AppLang lang, String en, String fr) => lang == AppLang.fr ? fr : en;
+
+  static String genre(AppLang lang, String g) {
+    if (lang == AppLang.en) return g;
+    switch (g) {
+      case 'All':
+        return 'Tout';
+      case 'Fantasy':
+        return 'Fantaisie';
+      case 'Supernatural':
+        return 'Surnaturel';
+      default:
+        return g;
+    }
+  }
+}
+
+// ============================================================================
 // DATA MODELS & CATALOG
 // ============================================================================
 
@@ -19,15 +43,19 @@ enum EpisodeAccess { free, unlocked, timer, locked }
 class StoryBeat {
   final double startSec;
   final double endSec;
-  final String speaker;
-  final String subtitle;
+  final String speakerEn;
+  final String speakerFr;
+  final String subtitleEn;
+  final String subtitleFr;
   final Color tint;
 
   const StoryBeat({
     required this.startSec,
     required this.endSec,
-    required this.speaker,
-    required this.subtitle,
+    required this.speakerEn,
+    required this.speakerFr,
+    required this.subtitleEn,
+    required this.subtitleFr,
     required this.tint,
   });
 }
@@ -35,7 +63,8 @@ class StoryBeat {
 class SagaEpisode {
   final String id;
   final int number;
-  final String title;
+  final String titleEn;
+  final String titleFr;
   final int durationSec;
   final EpisodeAccess access;
   final int coinCost;
@@ -46,7 +75,8 @@ class SagaEpisode {
   const SagaEpisode({
     required this.id,
     required this.number,
-    required this.title,
+    required this.titleEn,
+    required this.titleFr,
     required this.durationSec,
     required this.access,
     required this.coinCost,
@@ -60,15 +90,19 @@ class SagaComment {
   final String id;
   final String author;
   final int episodeNumber;
-  final String timeAgo;
-  final String text;
+  final String timeAgoEn;
+  final String timeAgoFr;
+  final String textEn;
+  final String textFr;
 
   const SagaComment({
     required this.id,
     required this.author,
     required this.episodeNumber,
-    required this.timeAgo,
-    required this.text,
+    required this.timeAgoEn,
+    required this.timeAgoFr,
+    required this.textEn,
+    required this.textFr,
   });
 }
 
@@ -76,18 +110,20 @@ class SagaSeries {
   final String id;
   final int rank;
   final String title;
-  final String tagline;
-  final String synopsis;
+  final String taglineEn;
+  final String taglineFr;
+  final String synopsisEn;
+  final String synopsisFr;
   final String genre;
   final String studio;
   final String rating;
-  final String viewsLabel;
   final int totalEpisodesCount;
   final String posterAsset;
   final String backdropAsset;
   final ParticleTheme particleTheme;
   final Color accentColor;
-  final String releaseSchedule;
+  final String scheduleEn;
+  final String scheduleFr;
   final List<SagaEpisode> episodes;
   final List<SagaComment> initialComments;
 
@@ -95,18 +131,20 @@ class SagaSeries {
     required this.id,
     required this.rank,
     required this.title,
-    required this.tagline,
-    required this.synopsis,
+    required this.taglineEn,
+    required this.taglineFr,
+    required this.synopsisEn,
+    required this.synopsisFr,
     required this.genre,
     required this.studio,
     required this.rating,
-    required this.viewsLabel,
     required this.totalEpisodesCount,
     required this.posterAsset,
     required this.backdropAsset,
     required this.particleTheme,
     required this.accentColor,
-    required this.releaseSchedule,
+    required this.scheduleEn,
+    required this.scheduleFr,
     required this.episodes,
     required this.initialComments,
   });
@@ -133,10 +171,11 @@ List<SagaEpisode> _buildEpisodes({
   required String rival,
   required Color tintA,
   required Color tintB,
-  required List<String> titles,
+  required List<(String, String)> titles,
 }) {
   return List.generate(titles.length, (i) {
     final num = i + 1;
+    final (titleEn, titleFr) = titles[i];
     final access = num <= 3
         ? EpisodeAccess.free
         : num == 4
@@ -145,7 +184,8 @@ List<SagaEpisode> _buildEpisodes({
     return SagaEpisode(
       id: '$sagaId-ep-$num',
       number: num,
-      title: titles[i],
+      titleEn: titleEn,
+      titleFr: titleFr,
       durationSec: 58,
       access: access,
       coinCost: num <= 8 ? 5 : 8,
@@ -155,29 +195,37 @@ List<SagaEpisode> _buildEpisodes({
         StoryBeat(
           startSec: 0,
           endSec: 12,
-          speaker: 'Narrator',
-          subtitle: '$sagaTitle — Episode $num: ${titles[i]}. The meridian bells toll past midnight.',
+          speakerEn: 'Narrator',
+          speakerFr: 'Narrateur',
+          subtitleEn: '$sagaTitle — Episode $num: $titleEn. The meridian bells toll past midnight.',
+          subtitleFr: '$sagaTitle — Épisode $num : $titleFr. Les cloches du méridien sonnent passé minuit.',
           tint: tintA,
         ),
         StoryBeat(
           startSec: 12,
           endSec: 27,
-          speaker: hero,
-          subtitle: 'Every second borrowed from the spire leaves a fracture across the lower district.',
+          speakerEn: hero,
+          speakerFr: hero,
+          subtitleEn: 'Every second borrowed from the spire leaves a fracture across the lower district.',
+          subtitleFr: 'Chaque seconde empruntée à la flèche laisse une fissure dans la ville basse.',
           tint: tintB,
         ),
         StoryBeat(
           startSec: 27,
           endSec: 43,
-          speaker: rival,
-          subtitle: 'You still fight for a city that forgot your oath. Draw your steel and prove time obeys you.',
+          speakerEn: rival,
+          speakerFr: rival,
+          subtitleEn: 'You still fight for a city that forgot your oath. Draw your steel.',
+          subtitleFr: 'Tu te bats encore pour une cité qui a oublié ton serment. Dégaine ta lame.',
           tint: tintA,
         ),
         StoryBeat(
           startSec: 43,
           endSec: 58,
-          speaker: hero,
-          subtitle: 'Then watch the pendulum stop. Zero Hour begins now.',
+          speakerEn: hero,
+          speakerFr: hero,
+          subtitleEn: 'Then watch the pendulum stop. Zero Hour begins now.',
+          subtitleFr: "Alors regarde le pendule s'arrêter. L'Heure Zéro commence maintenant.",
           tint: tintB,
         ),
       ],
@@ -190,19 +238,22 @@ final List<SagaSeries> kSagasCatalog = [
     id: 'chrono-blade',
     rank: 1,
     title: 'Chrono Blade: Zero Hour',
-    tagline: 'One borrowed minute. One shattered clocktower.',
-    synopsis:
-        'Exiled timekeeper Ren Vane wields an ember-forged katana capable of slicing sixty seconds out of fate. To rescue his sister from the Obsidian Meridian, he must outfight the Guild of Hours.',
+    taglineEn: 'One borrowed minute. One shattered clocktower.',
+    taglineFr: 'Une minute empruntée. Une tour brisée.',
+    synopsisEn:
+        'Exiled timekeeper Ren Vane wields an ember-forged katana capable of slicing sixty seconds out of fate.',
+    synopsisFr:
+        "Le gardien du temps exilé Ren Vane manie un katana forgé dans la braise, capable de trancher soixante secondes hors du destin.",
     genre: 'Action',
     studio: 'Studio Nocturne',
     rating: '4.9',
-    viewsLabel: '2.4M Views',
     totalEpisodesCount: 142,
     posterAsset: 'assets/images/poster_chrono_blade.jpg',
     backdropAsset: 'assets/images/hero_chrono_blade.jpg',
     particleTheme: ParticleTheme.embers,
     accentColor: const Color(0xFFF43F5E),
-    releaseSchedule: 'Daily 20:00',
+    scheduleEn: 'Daily 20:00',
+    scheduleFr: 'Tous les jours 20h00',
     episodes: _buildEpisodes(
       sagaId: 'chrono-blade',
       sagaTitle: 'Chrono Blade',
@@ -211,16 +262,14 @@ final List<SagaSeries> kSagasCatalog = [
       tintA: const Color.fromRGBO(244, 63, 94, 0.22),
       tintB: const Color.fromRGBO(245, 158, 11, 0.18),
       titles: const [
-        'The Broken Escapement',
-        'Sixty Borrowed Seconds',
-        'Embers Over Ward Seven',
-        'Oath of the Brass Spire',
-        'Shadow of the Second Hand',
-        'Duel on Rain-Slick Slate',
-        'The Clockmaker Ledger',
-        'Fractured Horizon',
-        'Echoes Before Dawn',
-        'Crimson Pendulum',
+        ('The Broken Escapement', "L'Échappement Brisé"),
+        ('Sixty Borrowed Seconds', 'Soixante Secondes Empruntées'),
+        ('Embers Over Ward Seven', 'Braises sur le Secteur Sept'),
+        ('Oath of the Brass Spire', 'Serment de la Flèche de Cuivre'),
+        ('Shadow of the Second Hand', "L'Ombre de la Trotteuse"),
+        ('Duel on Rain-Slick Slate', "Duel sur l'Ardoise Mouillée"),
+        ('The Clockmaker Ledger', "Le Registre de l'Horloger"),
+        ('Fractured Horizon', 'Horizon Fracturé'),
       ],
     ),
     initialComments: const [
@@ -228,15 +277,10 @@ final List<SagaSeries> kSagasCatalog = [
         id: 'c1',
         author: 'Kuroda_M',
         episodeNumber: 1,
-        timeAgo: '14m ago',
-        text: 'That clocktower opening frame hits hard in vertical full screen.',
-      ),
-      SagaComment(
-        id: 'c2',
-        author: 'SoraLine',
-        episodeNumber: 2,
-        timeAgo: '1h ago',
-        text: '58 seconds flew by — unlocking Episode 4 with daily coins.',
+        timeAgoEn: '14m ago',
+        timeAgoFr: 'il y a 14 min',
+        textEn: 'That clocktower opening frame hits hard in vertical full screen.',
+        textFr: "L'ouverture sur le beffroi claque vraiment en plein écran vertical.",
       ),
     ],
   ),
@@ -244,19 +288,22 @@ final List<SagaSeries> kSagasCatalog = [
     id: 'ashen-crown',
     rank: 2,
     title: 'Ashen Crown',
-    tagline: 'Beneath the eclipse, only iron remembers.',
-    synopsis:
-        'Betrayed on the eve of her coronation, Empress Seraphina returns from the cinder wastes with twin obsidian blades to reclaim the shattered citadel.',
+    taglineEn: 'Beneath the eclipse, only iron remembers.',
+    taglineFr: "Sous l'éclipse, seul le fer se souvient.",
+    synopsisEn:
+        'Betrayed on the eve of her coronation, Empress Seraphina returns from the cinder wastes with twin obsidian blades.',
+    synopsisFr:
+        "Trahie la veille de son couronnement, l'impératrice Seraphina revient des terres de cendre avec deux lames d'obsidienne.",
     genre: 'Fantasy',
     studio: 'Iron Spire Studio',
     rating: '4.8',
-    viewsLabel: '1.9M Views',
     totalEpisodesCount: 118,
     posterAsset: 'assets/images/poster_ashen_crown.jpg',
     backdropAsset: 'assets/images/poster_ashen_crown.jpg',
     particleTheme: ParticleTheme.ash,
     accentColor: const Color(0xFFEF4444),
-    releaseSchedule: 'Mon · Wed · Fri',
+    scheduleEn: 'Mon · Wed · Fri',
+    scheduleFr: 'Lun · Mer · Ven',
     episodes: _buildEpisodes(
       sagaId: 'ashen-crown',
       sagaTitle: 'Ashen Crown',
@@ -265,14 +312,12 @@ final List<SagaSeries> kSagasCatalog = [
       tintA: const Color.fromRGBO(239, 68, 68, 0.22),
       tintB: const Color.fromRGBO(251, 146, 60, 0.16),
       titles: const [
-        'Cinders of the First Throne',
-        'Twin Blades in Ash',
-        'Gate of the Fallen Guard',
-        'Blood Eclipse Rising',
-        'The Regent Confession',
-        'Siege of Marble Bridge',
-        'Crown of Cold Iron',
-        'Oathbreaker Trial',
+        ('Cinders of the First Throne', 'Cendres du Premier Trône'),
+        ('Twin Blades in Ash', 'Lames Jumelles dans la Cendre'),
+        ('Gate of the Fallen Guard', 'Porte de la Garde Déchue'),
+        ('Blood Eclipse Rising', "L'Éclipse de Sang se Lève"),
+        ('The Regent Confession', 'La Confession du Régent'),
+        ('Siege of Marble Bridge', 'Siège du Pont de Marbre'),
       ],
     ),
     initialComments: const [
@@ -280,8 +325,10 @@ final List<SagaSeries> kSagasCatalog = [
         id: 'c4',
         author: 'Mira_K',
         episodeNumber: 1,
-        timeAgo: '28m ago',
-        text: 'Seraphina armor design under the eclipse is incredible.',
+        timeAgoEn: '28m ago',
+        timeAgoFr: 'il y a 28 min',
+        textEn: 'Seraphina armor design under the eclipse is incredible.',
+        textFr: "Le design de l'armure de Seraphina sous l'éclipse est magnifique.",
       ),
     ],
   ),
@@ -289,19 +336,22 @@ final List<SagaSeries> kSagasCatalog = [
     id: 'rain-shogun',
     rank: 3,
     title: 'Rain Shogun: Sector 9',
-    tagline: 'Steel never rusts in neon rain.',
-    synopsis:
+    taglineEn: 'Steel never rusts in neon rain.',
+    taglineFr: "L'acier ne rouille jamais sous la pluie néon.",
+    synopsisEn:
         'In a flooded vertical metropolis ruled by algorithmic syndicates, a rogue courier guards the last unencrypted human memory.',
+    synopsisFr:
+        'Dans une métropole verticale inondée dominée par des syndicats algorithmiques, un coursier rebelle protège le dernier souvenir humain.',
     genre: 'Sci-Fi',
     studio: 'Kaze Works',
     rating: '4.9',
-    viewsLabel: '1.6M Views',
     totalEpisodesCount: 96,
     posterAsset: 'assets/images/poster_neon_shogun.jpg',
     backdropAsset: 'assets/images/poster_neon_shogun.jpg',
     particleTheme: ParticleTheme.rain,
     accentColor: const Color(0xFFF59E0B),
-    releaseSchedule: 'Tue · Thu · Sat',
+    scheduleEn: 'Tue · Thu · Sat',
+    scheduleFr: 'Mar · Jeu · Sam',
     episodes: _buildEpisodes(
       sagaId: 'rain-shogun',
       sagaTitle: 'Rain Shogun',
@@ -310,43 +360,35 @@ final List<SagaSeries> kSagasCatalog = [
       tintA: const Color.fromRGBO(245, 158, 11, 0.18),
       tintB: const Color.fromRGBO(56, 189, 248, 0.16),
       titles: const [
-        'Lanterns in Sector Nine',
-        'Static Under the Bridge',
-        'The Analog Visor',
-        'Midnight Monorail',
-        'Ghost Frequency',
-        'Steel Over Asphalt',
-        'Blackout Protocol',
-        'Last Train from Neo-Edo',
+        ('Lanterns in Sector Nine', 'Lanternes du Secteur Neuf'),
+        ('Static Under the Bridge', 'Parasites Sous le Pont'),
+        ('The Analog Visor', 'Le Viseur Analogique'),
+        ('Midnight Monorail', 'Monorail de Minuit'),
+        ('Ghost Frequency', 'Fréquence Fantôme'),
       ],
     ),
-    initialComments: const [
-      SagaComment(
-        id: 'c6',
-        author: 'TaroDrift',
-        episodeNumber: 1,
-        timeAgo: '42m ago',
-        text: 'The rain atmosphere in vertical mode looks awesome.',
-      ),
-    ],
+    initialComments: const [],
   ),
   SagaSeries(
     id: 'eclipse-pact',
     rank: 4,
     title: 'The Eclipse Pact',
-    tagline: 'Every shadow answers to the blood moon.',
-    synopsis:
+    taglineEn: 'Every shadow answers to the blood moon.',
+    taglineFr: 'Chaque ombre répond à la lune de sang.',
+    synopsisEn:
         'Archivist Julian Thorne unlocks a forbidden celestial astrolabe that binds twin spirit wolves to his bloodline.',
+    synopsisFr:
+        "L'archiviste Julian Thorne déverrouille un astrolabe céleste interdit qui lie deux loups spectraux à sa lignée.",
     genre: 'Supernatural',
     studio: 'Moonwell Animation',
     rating: '4.7',
-    viewsLabel: '1.3M Views',
     totalEpisodesCount: 108,
     posterAsset: 'assets/images/poster_eclipse_pact.jpg',
     backdropAsset: 'assets/images/poster_eclipse_pact.jpg',
     particleTheme: ParticleTheme.runes,
     accentColor: const Color(0xFFFB7185),
-    releaseSchedule: 'Daily 22:00',
+    scheduleEn: 'Daily 22:00',
+    scheduleFr: 'Tous les jours 22h00',
     episodes: _buildEpisodes(
       sagaId: 'eclipse-pact',
       sagaTitle: 'The Eclipse Pact',
@@ -355,43 +397,34 @@ final List<SagaSeries> kSagasCatalog = [
       tintA: const Color.fromRGBO(251, 113, 133, 0.20),
       tintB: const Color.fromRGBO(250, 204, 21, 0.15),
       titles: const [
-        'The Golden Astrolabe',
-        'Wolves of the Pine Mist',
-        'Crimson Moon Ascending',
-        'Ward of Silver Ash',
-        'The Seventh Grimoire',
-        'Hollow Sanctuary',
-        'Pact of Two Shadows',
-        'Beyond the Veil',
+        ('The Golden Astrolabe', "L'Astrolabe d'Or"),
+        ('Wolves of the Pine Mist', 'Loups de la Brume'),
+        ('Crimson Moon Ascending', 'Ascension de la Lune Pourpre'),
+        ('Ward of Silver Ash', "Sceau de Cendre d'Argent"),
       ],
     ),
-    initialComments: const [
-      SagaComment(
-        id: 'c7',
-        author: 'Noelle_R',
-        episodeNumber: 2,
-        timeAgo: '3h ago',
-        text: 'Julian and the shadow wolves carry this whole arc.',
-      ),
-    ],
+    initialComments: const [],
   ),
   SagaSeries(
     id: 'velvet-orbit',
     rank: 5,
     title: 'Velvet Orbit',
-    tagline: 'Two rival heirs above a dying ring.',
-    synopsis:
-        'Assigned to co-command an orbital conservatory around Saturn fading rings, rival academy pilots uncover a conspiracy.',
+    taglineEn: 'Two rival heirs above a dying ring.',
+    taglineFr: "Deux héritiers rivaux au-dessus d'un anneau mourant.",
+    synopsisEn:
+        'Assigned to co-command an orbital conservatory around Saturn rings, rival pilots uncover a conspiracy.',
+    synopsisFr:
+        "Chargés de co-diriger une station serre orbitale autour des anneaux de Saturne, deux pilotes rivaux découvrent un complot.",
     genre: 'Romance',
     studio: 'Atelier Celestia',
     rating: '4.8',
-    viewsLabel: '1.1M Views',
     totalEpisodesCount: 84,
     posterAsset: 'assets/images/poster_velvet_orbit.jpg',
     backdropAsset: 'assets/images/poster_velvet_orbit.jpg',
     particleTheme: ParticleTheme.stars,
     accentColor: const Color(0xFFFBBF24),
-    releaseSchedule: 'Fri · Sun',
+    scheduleEn: 'Fri · Sun',
+    scheduleFr: 'Ven · Dim',
     episodes: _buildEpisodes(
       sagaId: 'velvet-orbit',
       sagaTitle: 'Velvet Orbit',
@@ -400,25 +433,13 @@ final List<SagaSeries> kSagasCatalog = [
       tintA: const Color.fromRGBO(251, 191, 36, 0.18),
       tintB: const Color.fromRGBO(99, 102, 241, 0.20),
       titles: const [
-        'Conservatory in Orbit',
-        'The Ringed Horizon',
-        'Lanterns Under Glass',
-        'Zero-Gravity Waltz',
-        'Encrypted Star Chart',
-        'Solar Flare Warning',
-        'Starlight Confession',
-        'Promise Above Saturn',
+        ('Conservatory in Orbit', 'Verrière en Orbite'),
+        ('The Ringed Horizon', "L'Horizon aux Anneaux"),
+        ('Lanterns Under Glass', 'Lanternes Sous Verre'),
+        ('Zero-Gravity Waltz', 'Valse en Apesanteur'),
       ],
     ),
-    initialComments: const [
-      SagaComment(
-        id: 'c8',
-        author: 'Hana_S',
-        episodeNumber: 1,
-        timeAgo: '55m ago',
-        text: 'Loving the warm starlight conservatory vibe.',
-      ),
-    ],
+    initialComments: const [],
   ),
 ];
 
@@ -427,6 +448,7 @@ final List<SagaSeries> kSagasCatalog = [
 // ============================================================================
 
 class SagaAppState extends ChangeNotifier {
+  AppLang lang = AppLang.en;
   int coins = 30;
   bool dailyClaimed = false;
   final Set<String> unlockedIds = {};
@@ -471,6 +493,12 @@ class SagaAppState extends ChangeNotifier {
     super.dispose();
   }
 
+  void setLang(AppLang next) {
+    if (lang == next) return;
+    lang = next;
+    notifyListeners();
+  }
+
   bool isEpisodePlayable(SagaEpisode ep) {
     if (ep.access == EpisodeAccess.free || ep.access == EpisodeAccess.unlocked) return true;
     if (unlockedIds.contains(ep.id)) return true;
@@ -511,10 +539,12 @@ class SagaAppState extends ChangeNotifier {
       0,
       SagaComment(
         id: 'user-${DateTime.now().millisecondsSinceEpoch}',
-        author: 'You',
+        author: lang == AppLang.fr ? 'Vous' : 'You',
         episodeNumber: epNum,
-        timeAgo: 'Just now',
-        text: text,
+        timeAgoEn: 'Just now',
+        timeAgoFr: "À l'instant",
+        textEn: text,
+        textFr: text,
       ),
     );
     notifyListeners();
@@ -630,6 +660,7 @@ class _SagaEonShellState extends State<SagaEonShell> {
     return AnimatedBuilder(
       animation: widget.appState,
       builder: (context, _) {
+        final lang = widget.appState.lang;
         final activeSaga = kSagasCatalog.firstWhere(
           (s) => s.id == _activeSagaId,
           orElse: () => kSagasCatalog.first,
@@ -670,11 +701,11 @@ class _SagaEonShellState extends State<SagaEonShell> {
             unselectedItemColor: Colors.white54,
             selectedFontSize: 11,
             unselectedFontSize: 11,
-            items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Discover'),
-              BottomNavigationBarItem(icon: Icon(Icons.play_circle_fill), label: 'Watch'),
-              BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: 'My List'),
-              BottomNavigationBarItem(icon: Icon(Icons.monetization_on), label: 'Coins'),
+            items: [
+              BottomNavigationBarItem(icon: const Icon(Icons.explore), label: S.tr(lang, 'Discover', 'Découvrir')),
+              BottomNavigationBarItem(icon: const Icon(Icons.play_circle_fill), label: S.tr(lang, 'Watch', 'Regarder')),
+              BottomNavigationBarItem(icon: const Icon(Icons.bookmark), label: S.tr(lang, 'My List', 'Ma Liste')),
+              BottomNavigationBarItem(icon: const Icon(Icons.monetization_on), label: S.tr(lang, 'Coins', 'Pièces')),
             ],
           ),
         );
@@ -684,7 +715,7 @@ class _SagaEonShellState extends State<SagaEonShell> {
 }
 
 // ============================================================================
-// ARTWORK RENDERER (Asset or Pure-Flutter Atmospheric Fallback)
+// ARTWORK RENDERER
 // ============================================================================
 
 class SagaPosterArt extends StatelessWidget {
@@ -715,11 +746,7 @@ class SagaPosterArt extends StatelessWidget {
       ),
     );
 
-    return Image.asset(
-      useBackdrop ? saga.backdropAsset : saga.posterAsset,
-      fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) => fallback,
-    );
+    return fallback;
   }
 }
 
@@ -752,6 +779,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = widget.appState.lang;
     final featured = kSagasCatalog.first;
     final filtered = kSagasCatalog.where((s) {
       final matchesGenre = _selectedGenre == 'All' || s.genre == _selectedGenre;
@@ -769,7 +797,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
       children: [
-        // Top App Row
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -777,22 +804,36 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
               'Saga Eon',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: -0.3),
             ),
-            InkWell(
-              onTap: widget.onGoToCoins,
-              borderRadius: BorderRadius.circular(12),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                child: Row(
-                  children: [
-                    const Icon(Icons.monetization_on, size: 18, color: Color(0xFFF59E0B)),
-                    const SizedBox(width: 6),
-                    Text(
-                      '${widget.appState.coins}',
-                      style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFFBBF24)),
-                    ),
-                  ],
+            Row(
+              children: [
+                TextButton(
+                  onPressed: () => widget.appState.setLang(lang == AppLang.en ? AppLang.fr : AppLang.en),
+                  style: TextButton.styleFrom(
+                    backgroundColor: const Color(0xFF14161D),
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(44, 36),
+                  ),
+                  child: Text(lang == AppLang.en ? 'EN' : 'FR', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                 ),
-              ),
+                const SizedBox(width: 6),
+                InkWell(
+                  onTap: widget.onGoToCoins,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.monetization_on, size: 18, color: Color(0xFFF59E0B)),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${widget.appState.coins}',
+                          style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFFBBF24)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -823,17 +864,14 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Featured · ${featured.genre} · ${featured.totalEpisodesCount} Episodes',
+                        '${S.tr(lang, 'Featured', 'À la une')} · ${S.genre(lang, featured.genre)} · ${featured.totalEpisodesCount} ${S.tr(lang, 'Episodes', 'Épisodes')}',
                         style: const TextStyle(color: Colors.white70, fontSize: 12),
                       ),
                       const SizedBox(height: 6),
-                      Text(
-                        featured.title,
-                        style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, height: 1.15),
-                      ),
+                      Text(featured.title, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, height: 1.15)),
                       const SizedBox(height: 6),
                       Text(
-                        featured.tagline,
+                        lang == AppLang.fr ? featured.taglineFr : featured.taglineEn,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(color: Colors.white70, fontSize: 13),
@@ -844,7 +882,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                           FilledButton.icon(
                             onPressed: () => widget.onPlayEpisode(featured.id, 1),
                             icon: const Icon(Icons.play_arrow, size: 18),
-                            label: const Text('Watch Ep. 1'),
+                            label: Text(S.tr(lang, 'Watch Ep. 1', "Voir Ép. 1")),
                             style: FilledButton.styleFrom(
                               backgroundColor: const Color(0xFFF43F5E),
                               foregroundColor: Colors.white,
@@ -859,7 +897,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               side: const BorderSide(color: Colors.white24),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
-                            child: const Text('Episodes'),
+                            child: Text(S.tr(lang, 'Episodes', 'Épisodes')),
                           ),
                         ],
                       ),
@@ -877,7 +915,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           onChanged: (v) => setState(() => _searchQuery = v),
           style: const TextStyle(fontSize: 14),
           decoration: InputDecoration(
-            hintText: 'Search sagas or studios...',
+            hintText: S.tr(lang, 'Search sagas or studios...', 'Rechercher une saga ou un studio...'),
             hintStyle: const TextStyle(color: Colors.white38),
             prefixIcon: const Icon(Icons.search, color: Colors.white54, size: 20),
             filled: true,
@@ -916,12 +954,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     border: Border.all(color: active ? Colors.transparent : Colors.white12),
                   ),
                   child: Text(
-                    g,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: active ? Colors.white : Colors.white70,
-                    ),
+                    S.genre(lang, g),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: active ? Colors.white : Colors.white70),
                   ),
                 ),
               );
@@ -929,10 +963,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           ),
         ),
 
-        // Continue Watching
         if (continueEntries.isNotEmpty) ...[
           const SizedBox(height: 24),
-          const Text('Continue Watching', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+          Text(S.tr(lang, 'Continue Watching', 'Reprendre la lecture'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
           const SizedBox(height: 12),
           ...continueEntries.map((entry) {
             final saga = kSagasCatalog.firstWhere((s) => s.id == entry.sagaId);
@@ -954,11 +987,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(10),
-                        child: SizedBox(
-                          width: 54,
-                          height: 72,
-                          child: SagaPosterArt(saga: saga),
-                        ),
+                        child: SizedBox(width: 54, height: 72, child: SagaPosterArt(saga: saga)),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -968,7 +997,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             Text(saga.title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                             const SizedBox(height: 4),
                             Text(
-                              'Ep. ${ep.number} · ${ep.title}',
+                              '${S.tr(lang, 'Ep.', 'Ép.')} ${ep.number} · ${lang == AppLang.fr ? ep.titleFr : ep.titleEn}',
                               style: const TextStyle(color: Colors.white60, fontSize: 12),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -996,9 +1025,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           }),
         ],
 
-        // Top Ranked Sagas Carousel
         const SizedBox(height: 24),
-        const Text('Top Ranked Sagas', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+        Text(S.tr(lang, 'Top Ranked Sagas', 'Sagas les mieux classées'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
         const SizedBox(height: 12),
         SizedBox(
           height: 240,
@@ -1034,26 +1062,15 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               Positioned(
                                 left: 10,
                                 bottom: 8,
-                                child: Text(
-                                  saga.rank.toString().padLeft(2, '0'),
-                                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                                ),
+                                child: Text(saga.rank.toString().padLeft(2, '0'), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
                               ),
                             ],
                           ),
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        saga.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-                      ),
-                      Text(
-                        '${saga.genre} · ${saga.totalEpisodesCount} Ep',
-                        style: const TextStyle(color: Colors.white54, fontSize: 11),
-                      ),
+                      Text(saga.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                      Text('${S.genre(lang, saga.genre)} · ${saga.totalEpisodesCount} ${S.tr(lang, 'Ep', 'Ép')}', style: const TextStyle(color: Colors.white54, fontSize: 11)),
                     ],
                   ),
                 ),
@@ -1062,17 +1079,18 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           ),
         ),
 
-        // Catalog Grid
         const SizedBox(height: 24),
         Text(
-          _selectedGenre == 'All' ? 'All Vertical Sagas' : '$_selectedGenre Sagas',
+          _selectedGenre == 'All'
+              ? S.tr(lang, 'All Vertical Sagas', 'Toutes les sagas verticales')
+              : '${S.tr(lang, 'Sagas', 'Sagas')} · ${S.genre(lang, _selectedGenre)}',
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 12),
         if (filtered.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 28),
-            child: Center(child: Text('No sagas matched your search.', style: TextStyle(color: Colors.white54))),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 28),
+            child: Center(child: Text(S.tr(lang, 'No sagas matched your search.', 'Aucune saga trouvée.'), style: const TextStyle(color: Colors.white54))),
           )
         else
           GridView.builder(
@@ -1105,15 +1123,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              saga.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-                            ),
+                            Text(saga.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                             const SizedBox(height: 3),
                             Text(
-                              '${saga.genre} · ${saga.totalEpisodesCount} Ep · ${saga.rating}',
+                              '${S.genre(lang, saga.genre)} · ${saga.totalEpisodesCount} ${S.tr(lang, 'Ep', 'Ép')} · ${saga.rating}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(color: Colors.white54, fontSize: 11),
@@ -1169,6 +1182,7 @@ class _SagaDetailScreenState extends State<SagaDetailScreen> {
     return AnimatedBuilder(
       animation: widget.appState,
       builder: (context, _) {
+        final lang = widget.appState.lang;
         final isSaved = widget.appState.bookmarkedIds.contains(widget.saga.id);
         final lastEp = widget.appState.watchProgress[widget.saga.id]?.episodeNumber;
         final episodes = _unlockedOnly
@@ -1198,11 +1212,7 @@ class _SagaDetailScreenState extends State<SagaDetailScreen> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16),
-                    child: SizedBox(
-                      width: 118,
-                      height: 158,
-                      child: SagaPosterArt(saga: widget.saga),
-                    ),
+                    child: SizedBox(width: 118, height: 158, child: SagaPosterArt(saga: widget.saga)),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -1210,17 +1220,14 @@ class _SagaDetailScreenState extends State<SagaDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${widget.saga.genre} · ${widget.saga.totalEpisodesCount} Ep · ${widget.saga.rating}',
+                          '${S.genre(lang, widget.saga.genre)} · ${widget.saga.totalEpisodesCount} ${S.tr(lang, 'Ep', 'Ép')} · ${widget.saga.rating}',
                           style: const TextStyle(color: Colors.white60, fontSize: 12),
                         ),
                         const SizedBox(height: 6),
-                        Text(
-                          widget.saga.title,
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
+                        Text(widget.saga.title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 4),
                         Text(
-                          '${widget.saga.studio} · ${widget.saga.releaseSchedule}',
+                          '${widget.saga.studio} · ${lang == AppLang.fr ? widget.saga.scheduleFr : widget.saga.scheduleEn}',
                           style: const TextStyle(color: Colors.white54, fontSize: 12),
                         ),
                         const SizedBox(height: 12),
@@ -1229,7 +1236,7 @@ class _SagaDetailScreenState extends State<SagaDetailScreen> {
                           child: FilledButton.icon(
                             onPressed: () => widget.onPlayEpisode(lastEp ?? 1),
                             icon: const Icon(Icons.play_arrow, size: 18),
-                            label: Text(lastEp != null ? 'Resume Ep. $lastEp' : 'Watch Ep. 1'),
+                            label: Text(lastEp != null ? '${S.tr(lang, 'Resume Ep.', 'Reprendre Ép.')} $lastEp' : S.tr(lang, 'Watch Ep. 1', 'Voir Ép. 1')),
                             style: FilledButton.styleFrom(
                               backgroundColor: const Color(0xFFF43F5E),
                               foregroundColor: Colors.white,
@@ -1243,17 +1250,17 @@ class _SagaDetailScreenState extends State<SagaDetailScreen> {
                 ],
               ),
               const SizedBox(height: 14),
-              Text(widget.saga.synopsis, style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.5)),
+              Text(lang == AppLang.fr ? widget.saga.synopsisFr : widget.saga.synopsisEn, style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.5)),
               const SizedBox(height: 22),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Episodes', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(S.tr(lang, 'Episodes', 'Épisodes'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   SegmentedButton<bool>(
-                    segments: const [
-                      ButtonSegment(value: false, label: Text('All')),
-                      ButtonSegment(value: true, label: Text('Unlocked')),
+                    segments: [
+                      ButtonSegment(value: false, label: Text(S.tr(lang, 'All', 'Tous'))),
+                      ButtonSegment(value: true, label: Text(S.tr(lang, 'Unlocked', 'Débloqués'))),
                     ],
                     selected: {_unlockedOnly},
                     onSelectionChanged: (v) => setState(() => _unlockedOnly = v.first),
@@ -1266,6 +1273,7 @@ class _SagaDetailScreenState extends State<SagaDetailScreen> {
                 final playable = widget.appState.isEpisodePlayable(ep);
                 final timerSec = widget.appState.timerRemaining[ep.id] ?? 0;
                 final isTimer = !playable && ep.access == EpisodeAccess.timer && timerSec > 0;
+                final epTitle = lang == AppLang.fr ? ep.titleFr : ep.titleEn;
 
                 return Container(
                   margin: const EdgeInsets.only(bottom: 8),
@@ -1278,29 +1286,22 @@ class _SagaDetailScreenState extends State<SagaDetailScreen> {
                     onTap: () => widget.onPlayEpisode(ep.number),
                     leading: CircleAvatar(
                       backgroundColor: const Color(0xFF0B0C10),
-                      child: Text(
-                        ep.number.toString().padLeft(2, '0'),
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
-                      ),
+                      child: Text(ep.number.toString().padLeft(2, '0'), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
                     ),
-                    title: Text(ep.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                    title: Text(epTitle, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                     subtitle: Text(
                       playable
-                          ? '0:${ep.durationSec} · ${ep.access == EpisodeAccess.free ? 'Free' : 'Unlocked'}'
+                          ? '0:${ep.durationSec} · ${ep.access == EpisodeAccess.free ? S.tr(lang, 'Free', 'Gratuit') : S.tr(lang, 'Unlocked', 'Débloqué')}'
                           : isTimer
-                              ? '0:${ep.durationSec} · Free in ${_formatTimer(timerSec)}'
-                              : '0:${ep.durationSec} · ${ep.coinCost} Coins',
+                              ? '0:${ep.durationSec} · ${S.tr(lang, 'Free in', 'Gratuit dans')} ${_formatTimer(timerSec)}'
+                              : '0:${ep.durationSec} · ${ep.coinCost} ${S.tr(lang, 'Coins', 'Pièces')}',
                       style: TextStyle(
                         fontSize: 12,
-                        color: playable
-                            ? const Color(0xFF34D399)
-                            : isTimer
-                                ? const Color(0xFFFBBF24)
-                                : Colors.white54,
+                        color: playable ? const Color(0xFF34D399) : isTimer ? const Color(0xFFFBBF24) : Colors.white54,
                       ),
                     ),
                     trailing: playable
-                        ? const Text('Watch', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600))
+                        ? Text(S.tr(lang, 'Watch', 'Voir'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600))
                         : widget.appState.coins >= ep.coinCost
                             ? TextButton(
                                 onPressed: () {
@@ -1308,11 +1309,11 @@ class _SagaDetailScreenState extends State<SagaDetailScreen> {
                                     widget.onPlayEpisode(ep.number);
                                   }
                                 },
-                                child: Text('Unlock ${ep.coinCost}c', style: const TextStyle(color: Color(0xFFF43F5E))),
+                                child: Text('${S.tr(lang, 'Unlock', 'Débloquer')} ${ep.coinCost}c', style: const TextStyle(color: Color(0xFFF43F5E))),
                               )
                             : TextButton(
                                 onPressed: widget.onGoToCoins,
-                                child: const Text('Get Coins', style: TextStyle(color: Color(0xFFFBBF24))),
+                                child: Text(S.tr(lang, 'Get Coins', 'Obtenir'), style: const TextStyle(color: Color(0xFFFBBF24))),
                               ),
                   ),
                 );
@@ -1368,11 +1369,7 @@ class _VerticalSagaPlayerScreenState extends State<VerticalSagaPlayerScreen> {
 
   void _jumpToEpisode(int episodeNumber) {
     final idx = (episodeNumber - 1).clamp(0, widget.saga.episodes.length - 1);
-    _pageController.animateToPage(
-      idx,
-      duration: const Duration(milliseconds: 280),
-      curve: Curves.easeOutCubic,
-    );
+    _pageController.animateToPage(idx, duration: const Duration(milliseconds: 280), curve: Curves.easeOutCubic);
   }
 
   @override
@@ -1489,6 +1486,7 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
         return AnimatedBuilder(
           animation: widget.appState,
           builder: (_, __) {
+            final lang = widget.appState.lang;
             final comments = widget.appState.commentsFor(widget.saga);
             return Padding(
               padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
@@ -1503,7 +1501,7 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Comments (${comments.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                          Text('${S.tr(lang, 'Comments', 'Commentaires')} (${comments.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                           IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.close)),
                         ],
                       ),
@@ -1520,9 +1518,12 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('${c.author} · Ep. ${c.episodeNumber} · ${c.timeAgo}', style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                                Text(
+                                  '${c.author} · ${S.tr(lang, 'Ep.', 'Ép.')} ${c.episodeNumber} · ${lang == AppLang.fr ? c.timeAgoFr : c.timeAgoEn}',
+                                  style: const TextStyle(color: Colors.white54, fontSize: 11),
+                                ),
                                 const SizedBox(height: 4),
-                                Text(c.text, style: const TextStyle(fontSize: 14)),
+                                Text(lang == AppLang.fr ? c.textFr : c.textEn, style: const TextStyle(fontSize: 14)),
                               ],
                             ),
                           );
@@ -1537,7 +1538,7 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
                             child: TextField(
                               controller: controller,
                               decoration: InputDecoration(
-                                hintText: 'Add a comment...',
+                                hintText: S.tr(lang, 'Add a comment...', 'Ajouter un commentaire...'),
                                 filled: true,
                                 fillColor: const Color(0xFF0B0C10),
                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
@@ -1553,7 +1554,7 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
                               controller.clear();
                             },
                             style: FilledButton.styleFrom(backgroundColor: const Color(0xFFF43F5E)),
-                            child: const Text('Post'),
+                            child: Text(S.tr(lang, 'Post', 'Publier')),
                           ),
                         ],
                       ),
@@ -1569,6 +1570,7 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
   }
 
   void _openEpisodesSheet() {
+    final lang = widget.appState.lang;
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF14161D),
@@ -1585,7 +1587,7 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('${widget.saga.title} · Episodes', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                    Text('${widget.saga.title} · ${S.tr(lang, 'Episodes', 'Épisodes')}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                     IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.close)),
                   ],
                 ),
@@ -1599,17 +1601,20 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
                     final ep = widget.saga.episodes[i];
                     final playable = widget.appState.isEpisodePlayable(ep);
                     final isCurrent = ep.number == widget.episode.number;
+                    final epTitle = lang == AppLang.fr ? ep.titleFr : ep.titleEn;
                     return ListTile(
                       onTap: () {
                         Navigator.pop(ctx);
                         widget.onSelectEpisode(ep.number);
                       },
                       title: Text(
-                        '${ep.number.toString().padLeft(2, '0')} · ${ep.title}',
+                        '${ep.number.toString().padLeft(2, '0')} · $epTitle',
                         style: TextStyle(color: isCurrent ? const Color(0xFFF43F5E) : Colors.white, fontWeight: FontWeight.w600, fontSize: 14),
                       ),
                       trailing: Text(
-                        playable ? (isCurrent ? 'Playing' : 'Play') : '${ep.coinCost} Coins',
+                        playable
+                            ? (isCurrent ? S.tr(lang, 'Playing', 'En cours') : S.tr(lang, 'Play', 'Lire'))
+                            : '${ep.coinCost} ${S.tr(lang, 'Coins', 'Pièces')}',
                         style: const TextStyle(color: Colors.white60, fontSize: 12),
                       ),
                     );
@@ -1625,6 +1630,7 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = widget.appState.lang;
     final playable = widget.appState.isEpisodePlayable(widget.episode);
     final isLiked = widget.appState.likedEpisodeIds.contains(widget.episode.id);
     final isBookmarked = widget.appState.bookmarkedIds.contains(widget.saga.id);
@@ -1636,7 +1642,6 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Background Artwork with Ken Burns motion
         Transform.scale(
           scale: playable ? scale : 1.04,
           child: SagaPosterArt(saga: widget.saga, useBackdrop: widget.episode.number.isEven),
@@ -1651,7 +1656,6 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
             ),
           ),
         ),
-        // Contrast Scrims
         const DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -1663,7 +1667,6 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
           ),
         ),
 
-        // Tap anywhere to Play/Pause
         if (playable)
           GestureDetector(
             onTap: () => setState(() => _isPlaying = !_isPlaying),
@@ -1700,7 +1703,7 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
                   children: [
                     Text(widget.saga.title, style: const TextStyle(color: Colors.white70, fontSize: 12)),
                     Text(
-                      'Ep. ${widget.episode.number} · ${widget.episode.title}',
+                      '${S.tr(lang, 'Ep.', 'Ép.')} ${widget.episode.number} · ${lang == AppLang.fr ? widget.episode.titleFr : widget.episode.titleEn}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -1708,6 +1711,12 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
                   ],
                 ),
               ),
+              TextButton(
+                onPressed: () => widget.appState.setLang(lang == AppLang.en ? AppLang.fr : AppLang.en),
+                style: TextButton.styleFrom(backgroundColor: Colors.black45, foregroundColor: Colors.white),
+                child: Text(lang == AppLang.en ? 'EN' : 'FR'),
+              ),
+              const SizedBox(width: 4),
               TextButton(
                 onPressed: () => setState(() => _speed = _speed == 1.0 ? 1.5 : 1.0),
                 style: TextButton.styleFrom(backgroundColor: Colors.black45, foregroundColor: Colors.white),
@@ -1727,33 +1736,24 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
                 onPressed: () => widget.appState.toggleLike(widget.episode.id),
                 icon: Icon(isLiked ? Icons.favorite : Icons.favorite_border, color: isLiked ? const Color(0xFFF43F5E) : Colors.white, size: 28),
               ),
-              Text(
-                '${((widget.episode.likes + (isLiked ? 1 : 0)) / 1000).toStringAsFixed(1)}K',
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-              ),
+              Text('${((widget.episode.likes + (isLiked ? 1 : 0)) / 1000).toStringAsFixed(1)}K', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
               const SizedBox(height: 12),
-              IconButton(
-                onPressed: _openCommentsSheet,
-                icon: const Icon(Icons.comment_outlined, size: 27),
-              ),
+              IconButton(onPressed: _openCommentsSheet, icon: const Icon(Icons.comment_outlined, size: 27)),
               Text('$commentsCount', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
               const SizedBox(height: 12),
               IconButton(
                 onPressed: () => widget.appState.toggleBookmark(widget.saga.id),
                 icon: Icon(isBookmarked ? Icons.bookmark : Icons.bookmark_border, color: isBookmarked ? const Color(0xFFFBBF24) : Colors.white, size: 28),
               ),
-              Text(isBookmarked ? 'Saved' : 'Save', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+              Text(isBookmarked ? S.tr(lang, 'Saved', 'Enreg.') : S.tr(lang, 'Save', 'Enreg.'), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
               const SizedBox(height: 12),
-              IconButton(
-                onPressed: _openEpisodesSheet,
-                icon: const Icon(Icons.list_alt, size: 28),
-              ),
-              const Text('Episodes', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+              IconButton(onPressed: _openEpisodesSheet, icon: const Icon(Icons.list_alt, size: 28)),
+              Text(S.tr(lang, 'Episodes', 'Épisodes'), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
               const SizedBox(height: 12),
               IconButton(
                 onPressed: () {
                   Clipboard.setData(ClipboardData(text: '${widget.saga.title} - Ep ${widget.episode.number}'));
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Episode link copied')));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.tr(lang, 'Episode link copied', "Lien de l'épisode copié"))));
                 },
                 icon: const Icon(Icons.share_outlined, size: 25),
               ),
@@ -1761,7 +1761,6 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
           ),
         ),
 
-        // Lower-Third Dialogue & Scrubber OR Locked Episode Overlay
         if (playable)
           Positioned(
             left: 16,
@@ -1770,9 +1769,9 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(beat.speaker, style: const TextStyle(color: Color(0xFFF43F5E), fontWeight: FontWeight.bold, fontSize: 12)),
+                Text(lang == AppLang.fr ? beat.speakerFr : beat.speakerEn, style: const TextStyle(color: Color(0xFFF43F5E), fontWeight: FontWeight.bold, fontSize: 12)),
                 const SizedBox(height: 4),
-                Text(beat.subtitle, style: const TextStyle(fontSize: 14, height: 1.4, fontWeight: FontWeight.w500)),
+                Text(lang == AppLang.fr ? beat.subtitleFr : beat.subtitleEn, style: const TextStyle(fontSize: 14, height: 1.4, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 10),
                 Row(
                   children: [
@@ -1791,10 +1790,7 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
                         onChanged: (v) => setState(() => _currentSec = v),
                       ),
                     ),
-                    Text(
-                      '${_clock(_currentSec)} / ${_clock(widget.episode.durationSec.toDouble())}',
-                      style: const TextStyle(fontSize: 11, color: Colors.white70),
-                    ),
+                    Text('${_clock(_currentSec)} / ${_clock(widget.episode.durationSec.toDouble())}', style: const TextStyle(fontSize: 11, color: Colors.white70)),
                   ],
                 ),
               ],
@@ -1809,21 +1805,14 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
               children: [
                 const Icon(Icons.lock_outline, size: 42, color: Color(0xFFFBBF24)),
                 const SizedBox(height: 14),
-                Text(
-                  '${widget.saga.title} · Episode ${widget.episode.number}',
-                  style: const TextStyle(color: Colors.white60, fontSize: 12),
-                ),
+                Text('${widget.saga.title} · ${S.tr(lang, 'Episode', 'Épisode')} ${widget.episode.number}', style: const TextStyle(color: Colors.white60, fontSize: 12)),
                 const SizedBox(height: 6),
-                Text(
-                  widget.episode.title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
+                Text(lang == AppLang.fr ? widget.episode.titleFr : widget.episode.titleEn, textAlign: TextAlign.center, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 10),
                 Text(
                   widget.episode.access == EpisodeAccess.timer && timerLeft > 0
-                      ? 'Unlocks free in ${_clock(timerLeft.toDouble())} or unlock immediately.'
-                      : 'Unlock this episode to continue watching.',
+                      ? '${S.tr(lang, 'Unlocks free in', 'Déblocage gratuit dans')} ${_clock(timerLeft.toDouble())}'
+                      : S.tr(lang, 'Unlock this episode to continue watching.', 'Débloquez cet épisode pour continuer.'),
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: Colors.white70, fontSize: 13),
                 ),
@@ -1834,18 +1823,18 @@ class _EpisodeVerticalFrameState extends State<_EpisodeVerticalFrame> {
                       ? FilledButton.icon(
                           onPressed: () => widget.appState.unlockEpisode(widget.episode),
                           icon: const Icon(Icons.monetization_on, size: 18),
-                          label: Text('Unlock · ${widget.episode.coinCost} Coins'),
+                          label: Text('${S.tr(lang, 'Unlock', 'Débloquer')} · ${widget.episode.coinCost} ${S.tr(lang, 'Coins', 'Pièces')}'),
                           style: FilledButton.styleFrom(backgroundColor: const Color(0xFFF43F5E)),
                         )
                       : FilledButton.icon(
                           onPressed: widget.onGoToCoins,
                           icon: const Icon(Icons.monetization_on, size: 18),
-                          label: Text('Get Free Coins (${widget.appState.coins})'),
+                          label: Text('${S.tr(lang, 'Get Free Coins', 'Pièces gratuites')} (${widget.appState.coins})'),
                           style: FilledButton.styleFrom(backgroundColor: const Color(0xFFF59E0B), foregroundColor: Colors.black),
                         ),
                 ),
                 const SizedBox(height: 10),
-                TextButton(onPressed: _openEpisodesSheet, child: const Text('Browse Episodes')),
+                TextButton(onPressed: _openEpisodesSheet, child: Text(S.tr(lang, 'Browse Episodes', 'Parcourir les épisodes'))),
               ],
             ),
           ),
@@ -1922,6 +1911,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = widget.appState.lang;
     final saved = kSagasCatalog.where((s) => widget.appState.bookmarkedIds.contains(s.id)).toList();
     final history = widget.appState.watchProgress.values.toList()
       ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
@@ -1929,12 +1919,12 @@ class _LibraryScreenState extends State<LibraryScreen> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const Text('My List', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+        Text(S.tr(lang, 'My List', 'Ma Liste'), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
         const SizedBox(height: 14),
         SegmentedButton<bool>(
           segments: [
-            ButtonSegment(value: false, label: Text('Saved (${saved.length})')),
-            ButtonSegment(value: true, label: Text('History (${history.length})')),
+            ButtonSegment(value: false, label: Text('${S.tr(lang, 'Saved', 'Enregistrées')} (${saved.length})')),
+            ButtonSegment(value: true, label: Text('${S.tr(lang, 'History', 'Historique')} (${history.length})')),
           ],
           selected: {_showHistory},
           onSelectionChanged: (v) => setState(() => _showHistory = v.first),
@@ -1947,9 +1937,9 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 40),
                 child: Column(
                   children: [
-                    const Text('Your watchlist is empty.', style: TextStyle(color: Colors.white60)),
+                    Text(S.tr(lang, 'Your watchlist is empty.', 'Votre liste est vide.'), style: const TextStyle(color: Colors.white60)),
                     const SizedBox(height: 12),
-                    FilledButton(onPressed: widget.onBrowseDiscover, child: const Text('Browse Sagas')),
+                    FilledButton(onPressed: widget.onBrowseDiscover, child: Text(S.tr(lang, 'Browse Sagas', 'Parcourir les sagas'))),
                   ],
                 ),
               ),
@@ -1981,14 +1971,14 @@ class _LibraryScreenState extends State<LibraryScreen> {
                         children: [
                           Text(saga.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                           const SizedBox(height: 4),
-                          Text('${saga.genre} · ${saga.totalEpisodesCount} Ep', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                          Text('${S.genre(lang, saga.genre)} · ${saga.totalEpisodesCount} ${S.tr(lang, 'Ep', 'Ép')}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
                           const SizedBox(height: 10),
                           Row(
                             children: [
                               FilledButton.icon(
                                 onPressed: () => widget.onPlayEpisode(saga.id, resumeEp),
                                 icon: const Icon(Icons.play_arrow, size: 16),
-                                label: Text('Watch Ep. $resumeEp'),
+                                label: Text('${S.tr(lang, 'Watch Ep.', 'Voir Ép.')} $resumeEp'),
                                 style: FilledButton.styleFrom(backgroundColor: const Color(0xFFF43F5E), padding: const EdgeInsets.symmetric(horizontal: 12)),
                               ),
                               const SizedBox(width: 8),
@@ -2016,7 +2006,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 child: SizedBox(width: 44, height: 58, child: SagaPosterArt(saga: saga)),
               ),
               title: Text(saga.title, style: const TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: Text('Ep. ${ep.number} · ${ep.title}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+              subtitle: Text('${S.tr(lang, 'Ep.', 'Ép.')} ${ep.number} · ${lang == AppLang.fr ? ep.titleFr : ep.titleEn}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
               trailing: const Icon(Icons.play_arrow, color: Color(0xFFF43F5E)),
             );
           }),
@@ -2026,7 +2016,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
 }
 
 // ============================================================================
-// SCREEN 5: EON COINS WALLET
+// SCREEN 5: EON COINS WALLET & LANGUAGE PREFERENCE
 // ============================================================================
 
 class CoinsWalletScreen extends StatefulWidget {
@@ -2053,7 +2043,10 @@ class _CoinsWalletScreenState extends State<CoinsWalletScreen> {
         t.cancel();
         setState(() => _adCountdown = null);
         widget.appState.addCoins(15);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('+15 Eon Coins earned')));
+        final lang = widget.appState.lang;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(S.tr(lang, '+15 Eon Coins earned', '+15 Pièces Eon gagnées'))),
+        );
       } else {
         setState(() => _adCountdown = _adCountdown! - 1);
       }
@@ -2068,10 +2061,11 @@ class _CoinsWalletScreenState extends State<CoinsWalletScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final packs = const [
-      (50, 'Starter Pouch', '\$0.99'),
-      (180, 'Arc Bundle', '\$2.99'),
-      (500, 'Season Vault', '\$6.99'),
+    final lang = widget.appState.lang;
+    final packs = [
+      (50, S.tr(lang, 'Starter Pouch', 'Bourse Débutant'), '\$0.99'),
+      (180, S.tr(lang, 'Arc Bundle', 'Pack Arc'), '\$2.99'),
+      (500, S.tr(lang, 'Season Vault', 'Coffre Saison'), '\$6.99'),
     ];
 
     return ListView(
@@ -2087,7 +2081,7 @@ class _CoinsWalletScreenState extends State<CoinsWalletScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Eon Coins Balance', style: TextStyle(color: Colors.white60, fontSize: 12)),
+              Text(S.tr(lang, 'Eon Coins Balance', 'Solde Pièces Eon'), style: const TextStyle(color: Colors.white60, fontSize: 12)),
               const SizedBox(height: 6),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -2095,30 +2089,34 @@ class _CoinsWalletScreenState extends State<CoinsWalletScreen> {
                 children: [
                   Text('${widget.appState.coins}', style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
                   const SizedBox(width: 8),
-                  const Text('Coins', style: TextStyle(color: Color(0xFFFBBF24), fontWeight: FontWeight.w600)),
+                  Text(S.tr(lang, 'Coins', 'Pièces'), style: const TextStyle(color: Color(0xFFFBBF24), fontWeight: FontWeight.w600)),
                 ],
               ),
-              const SizedBox(height: 6),
-              Text(
-                '${widget.appState.unlockedIds.length} premium episodes unlocked',
-                style: const TextStyle(color: Colors.white54, fontSize: 12),
+              const SizedBox(height: 12),
+              SegmentedButton<AppLang>(
+                segments: const [
+                  ButtonSegment(value: AppLang.en, label: Text('English')),
+                  ButtonSegment(value: AppLang.fr, label: Text('Français')),
+                ],
+                selected: {lang},
+                onSelectionChanged: (v) => widget.appState.setLang(v.first),
               ),
             ],
           ),
         ),
         const SizedBox(height: 22),
-        const Text('Earn Free Coins', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(S.tr(lang, 'Earn Free Coins', 'Gagner des pièces gratuites'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         ListTile(
           tileColor: const Color(0xFF14161D),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           leading: const Icon(Icons.card_giftcard, color: Color(0xFFFBBF24)),
-          title: const Text('Daily Check-In Bonus'),
-          subtitle: const Text('+20 Coins every day', style: TextStyle(color: Colors.white54, fontSize: 12)),
+          title: Text(S.tr(lang, 'Daily Check-In Bonus', 'Bonus quotidien')),
+          subtitle: Text(S.tr(lang, '+20 Coins every day', '+20 Pièces chaque jour'), style: const TextStyle(color: Colors.white54, fontSize: 12)),
           trailing: FilledButton(
             onPressed: widget.appState.dailyClaimed ? null : widget.appState.claimDaily,
             style: FilledButton.styleFrom(backgroundColor: const Color(0xFFF43F5E)),
-            child: Text(widget.appState.dailyClaimed ? 'Claimed' : 'Claim +20'),
+            child: Text(widget.appState.dailyClaimed ? S.tr(lang, 'Claimed', 'Réclamé') : S.tr(lang, 'Claim +20', 'Réclamer +20')),
           ),
         ),
         const SizedBox(height: 10),
@@ -2126,15 +2124,15 @@ class _CoinsWalletScreenState extends State<CoinsWalletScreen> {
           tileColor: const Color(0xFF14161D),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           leading: const Icon(Icons.smart_display, color: Color(0xFFF43F5E)),
-          title: const Text('Watch Short Preview'),
-          subtitle: const Text('5-second reel · +15 Coins', style: TextStyle(color: Colors.white54, fontSize: 12)),
+          title: Text(S.tr(lang, 'Watch Short Preview', 'Regarder un aperçu')),
+          subtitle: Text(S.tr(lang, '5-second reel · +15 Coins', 'Extrait de 5 s · +15 Pièces'), style: const TextStyle(color: Colors.white54, fontSize: 12)),
           trailing: FilledButton(
             onPressed: _adCountdown != null ? null : _startPreviewAd,
-            child: Text(_adCountdown != null ? '${_adCountdown}s' : 'Watch +15'),
+            child: Text(_adCountdown != null ? '${_adCountdown}s' : S.tr(lang, 'Watch +15', 'Voir +15')),
           ),
         ),
         const SizedBox(height: 22),
-        const Text('Coin Packs', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(S.tr(lang, 'Coin Packs', 'Packs de pièces'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         ...packs.map(
           (p) => Padding(
@@ -2143,11 +2141,13 @@ class _CoinsWalletScreenState extends State<CoinsWalletScreen> {
               tileColor: const Color(0xFF14161D),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               leading: const Icon(Icons.monetization_on, color: Color(0xFFF59E0B)),
-              title: Text('${p.$1} Coins · ${p.$2}'),
+              title: Text('${p.$1} ${S.tr(lang, 'Coins', 'Pièces')} · ${p.$2}'),
               trailing: Text(p.$3, style: const TextStyle(color: Color(0xFFFBBF24), fontWeight: FontWeight.bold)),
               onTap: () {
                 widget.appState.addCoins(p.$1);
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added +${p.$1} Coins')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('+${p.$1} ${S.tr(lang, 'Coins', 'Pièces')}')),
+                );
               },
             ),
           ),
